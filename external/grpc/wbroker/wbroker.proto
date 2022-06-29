@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package wbroker;
+
+option go_package = "./wbroker";
+
+service WBroker {
+  rpc Publish(PublishRequest) returns (PublishResponse);
+  rpc Subscribe(SubscribeRequest) returns (stream Message);
+}
+
+message PublishRequest {
+  string topic = 1;
+  bytes body = 2;
+  int32 ttl = 3;
+}
+
+message PublishResponse {
+  string id = 1;
+}
+
+message SubscribeRequest {
+  string topic = 1;
+}
+
+message Message {
+  bytes body = 1;
+}
