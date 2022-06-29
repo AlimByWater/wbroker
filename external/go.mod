@@ -1,4 +1,4 @@
-module wbroker/external
+module external
 
 go 1.18
 

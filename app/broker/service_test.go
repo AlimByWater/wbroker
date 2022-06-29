@@ -5,26 +5,13 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
-	grpcOrig "google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"testing"
 	"wbroker/app/broker"
-	wb "wbroker/external/grpc/wbroker"
 )
 
 func testMessage() broker.Message {
 	body := fmt.Sprintf("test_%s", uuid.New().String())
 	return broker.Message{Body: body}
-}
-
-func testGRPCClient(t *testing.T) wb.WBrokerClient {
-	conn, err := grpcOrig.Dial("localhost:8018", grpcOrig.WithTransportCredentials(insecure.NewCredentials()), grpcOrig.WithBlock())
-	if err != nil {
-		t.Fatalf("couldnt connect: %s", err)
-	}
-	defer conn.Close()
-
-	return wb.NewWBrokerClient(conn)
 }
 
 func TestIntegration_Broker(t *testing.T) {
