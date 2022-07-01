@@ -39,17 +39,15 @@ func NewTopic(name string) *Topic {
 	return topic
 }
 
-func (t *Topic) RegisterNewSubscriber(ctx context.Context) <-chan Message {
+func (t *Topic) RegisterNewSubscriber(ctx context.Context) chan Message {
 	sub := NewSubscriber(ctx, t.deleteSubC)
 
-	t.mu.Lock()
-	defer t.mu.Unlock()
 	t.Subscribers[sub.ID] = sub
 
 	return sub.MsgC
 }
 
-func (t *Topic) Publish(ctx context.Context, topicName string, message Message) (string, error) {
+func (t *Topic) Publish(message Message) (string, error) {
 	message = t.MessagesStorage.RegisterNewMessage(message)
 
 	t.msgPubC <- message
@@ -65,10 +63,11 @@ func (t *Topic) eventListener() {
 
 			for _, sub := range t.Subscribers {
 				go func(s *Subscriber) {
+					defer wg.Done()
 					sub.MsgC <- msg
-					wg.Done()
 				}(sub)
 			}
+			wg.Wait()
 		case sub := <-t.deleteSubC:
 			t.mu.Lock()
 			delete(t.Subscribers, sub.ID)

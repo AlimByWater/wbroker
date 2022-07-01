@@ -13,7 +13,7 @@ type (
 
 	// Service is a broker service interface
 	Service interface {
-		Subscribe(ctx context.Context, topicName string) (<-chan Message, error)
+		Subscribe(ctx context.Context, topicName string) (chan Message, error)
 		Publish(ctx context.Context, topicName string, message Message) (string, error)
 	}
 
@@ -34,7 +34,7 @@ func NewBroker() *ActualBroker {
 	}
 }
 
-func (b *ActualBroker) Subscribe(ctx context.Context, topicName string) (<-chan Message, error) {
+func (b *ActualBroker) Subscribe(ctx context.Context, topicName string) (chan Message, error) {
 	topic, exist := b.topics.Topic(topicName)
 	if !exist {
 		topic = b.topics.CreateTopic(topicName)
@@ -50,7 +50,7 @@ func (b *ActualBroker) Publish(ctx context.Context, topicName string, message Me
 		topic = b.topics.CreateTopic(topicName)
 	}
 
-	id, err := topic.Publish(ctx, topicName, message)
+	id, err := topic.Publish(message)
 	if err != nil {
 		return "", fmt.Errorf("failed to publish message")
 	}

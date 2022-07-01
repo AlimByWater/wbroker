@@ -14,23 +14,22 @@ func testMessage() broker.Message {
 	return broker.Message{Body: body}
 }
 
-func TestIntegration_Broker(t *testing.T) {
+func TestTwoSubsShouldRecieveMessage(t *testing.T) {
 	b := broker.TestBroker(t)
 	msg := testMessage()
 
-	sub1, _ := b.Subscribe(context.Background(), "tt")
-	sub2, _ := b.Subscribe(context.Background(), "tt")
+	sub1Chan, _ := b.Subscribe(context.Background(), "tt")
+	sub2Chan, _ := b.Subscribe(context.Background(), "tt")
 
-	_, _ = b.Publish(context.Background(), "tt", msg)
+	id, _ := b.Publish(context.Background(), "tt", msg)
+	msg.ID = id
 
-	respMsg1 := <-sub1
-	respMsg2 := <-sub2
-
-	assert.Equal(t, msg, respMsg1)
-	assert.Equal(t, msg, respMsg2)
-}
-
-func TestUUID(t *testing.T) {
-	id := uuid.New().ID()
-	t.Log(id)
+	for i := 0; i < 2; i++ {
+		select {
+		case respMsg1 := <-sub1Chan:
+			assert.Equal(t, msg, respMsg1)
+		case respMsg2 := <-sub2Chan:
+			assert.Equal(t, msg, respMsg2)
+		}
+	}
 }

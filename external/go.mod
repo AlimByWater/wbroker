@@ -1,4 +1,4 @@
-module external
+module github.com/AlimByWater/wbroker/external
 
 go 1.18
 
