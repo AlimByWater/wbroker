@@ -58,7 +58,6 @@ func (w *WBroker) Main() interface{} {
 
 func (w *WBroker) mainFunc() interface{} {
 	return func(ctx context.Context, app App) {
-
 		if err := app.Run(ctx); err != nil {
 			logrus.Errorf("Failed run app: %s", err.Error())
 			// for most cases app should be restarted

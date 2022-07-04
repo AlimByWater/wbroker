@@ -1,6 +1,7 @@
 package dic
 
 import (
+	"github.com/sirupsen/logrus"
 	"go.uber.org/dig"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
@@ -48,6 +49,8 @@ func newConfig(body []byte) (Configs, error) {
 	}
 
 	cfg.RawConfig = body
+
+	logrus.Info(cfg.GRPCServer.Port)
 
 	return cfg, nil
 }

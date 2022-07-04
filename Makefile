@@ -1,5 +1,14 @@
 GRPC_EXTERNAL=./external/grpc/wbroker
 PROTO_FILES=$(shell find . -name "*.proto" | sort)
+GRPC_PORT=24005
+
+.PHONY: run
+run: docker_build docker_run
+
+docker_build:
+	docker build -t wbroker .
+docker_run:
+	docker run -d -p $(GRPC_PORT):$(GRPC_PORT) wbroker
 
 compile_proto: compile_proto_code compile_proto_doc
 

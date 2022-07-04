@@ -19,24 +19,25 @@ type (
 
 		// GRPC configs for gRPC-server
 		GRPC *GRPCServerConfig `optional:"true"`
-		// GRPCServer common gRPC-server
-		GPRCServer *grpc.Server
+		//// GRPCServer common gRPC-server
+		//GPRCServer *grpc.Server
 		// GRPCDefinitions grpc servers implementations
 		GRPCDefinitions []Definition `group:"grpc_impl"`
 	}
 )
 
-func RegisterGRPC(p GRPCServerParams) interface{} {
+func RegisterGRPC(p GRPCServerParams) *grpc.Server {
 	if p.GRPC != nil {
 		logrus.Infof("Create gRPC server, port: %d", p.GRPC.Port)
+		server := grpc.NewServer()
 		for _, i := range p.GRPCDefinitions {
-			p.GPRCServer.RegisterService(i.Description, i.Implementation)
+			server.RegisterService(i.Description, i.Implementation)
 		}
 
-		reflection.Register(p.GPRCServer)
+		reflection.Register(server)
 
-		return p.GPRCServer
+		return server
 	}
 
-	return p.GPRCServer
+	return nil
 }

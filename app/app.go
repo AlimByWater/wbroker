@@ -14,8 +14,8 @@ import (
 
 var Modules = grpc.Module.
 	Append(configs.Modules).
+	Append(broker.Modules).
 	Append(dic.Module{
-		{CreateFunc: broker.NewBroker},
 		{CreateFunc: NewApp},
 	})
 
@@ -41,13 +41,17 @@ func (a *App) Run(ctx context.Context) error {
 		return err
 	}
 
-	if err := a.grpcServer.Serve(grpcLis); err != nil {
-		if err != grpcOrig.ErrServerStopped {
-			panic(fmt.Sprintf("grpc: Serve return unexpected error: %s", err))
+	go func() {
+		if err := a.grpcServer.Serve(grpcLis); err != nil {
+			if err != grpcOrig.ErrServerStopped {
+				panic(fmt.Sprintf("grpc: Serve return unexpected error: %s", err))
+			}
 		}
-	}
+	}()
 
 	logrus.Info("App successfully started 🐣")
+
+	<-ctx.Done()
 
 	return nil
 }

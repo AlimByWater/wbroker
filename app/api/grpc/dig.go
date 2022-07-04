@@ -3,14 +3,13 @@ package grpc
 import (
 	wb "github.com/AlimByWater/wbroker/external/grpc/wbroker"
 	"go.uber.org/dig"
-	"google.golang.org/grpc"
 	dic "wbroker/app/dig"
 )
 
 // Module is api module
 var Module = dic.Module{
 	{CreateFunc: NewServer},
-	{CreateFunc: grpc.NewServer},
+	//{CreateFunc: grpc.NewServer},
 	{CreateFunc: Adapter},
 }
 

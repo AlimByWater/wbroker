@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	flagGraph   = flag.Bool("graph", false, "creates dependencies graph")
+	flagGraph   = flag.Bool("graph", true, "creates dependencies graph")
 	flagAppName = flag.String("app-name", "wbroker", "")
 	flagConfig  = flag.String("configs-file", "configs/configs.local.yaml", "configs file name")
 )
@@ -21,7 +21,7 @@ func main() {
 
 	if *flagGraph {
 		app.Graph("graph.dot")
-		return
+		//return
 	}
 
 	app.Run()

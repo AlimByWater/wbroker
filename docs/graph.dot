@@ -1,0 +1,107 @@
+digraph {
+	rankdir=RL;
+	graph [compound=true];
+	"[type=dic.Definition group=grpc_impl]" [shape=diamond label=<dic.Definition<BR /><FONT POINT-SIZE="10">Group: grpc_impl</FONT>>];
+		"[type=dic.Definition group=grpc_impl]" -> "dic.Definition[group=grpc_impl]0";
+		
+	
+		subgraph cluster_0 {
+			label = "wbroker/app/api/grpc";
+			constructor_0 [shape=plaintext label="NewServer"];
+			
+			"*grpc.Server" [label=<*grpc.Server>];
+			
+		}
+		
+			constructor_0 -> "broker.Service" [ltail=cluster_0];
+		
+		
+		subgraph cluster_1 {
+			label = "wbroker/app/api/grpc";
+			constructor_1 [shape=plaintext label="Adapter"];
+			
+			"dic.Definition[group=grpc_impl]0" [label=<dic.Definition<BR /><FONT POINT-SIZE="10">Group: grpc_impl</FONT>>];
+			
+		}
+		
+			constructor_1 -> "*grpc.Server" [ltail=cluster_1];
+		
+		
+		subgraph cluster_2 {
+			label = "wbroker/app/configs";
+			constructor_2 [shape=plaintext label="NewConfig"];
+			
+			"*configs.Configs" [label=<*configs.Configs>];
+			
+		}
+		
+			constructor_2 -> "[]uint8[name=raw_config]" [ltail=cluster_2];
+		
+		
+		subgraph cluster_3 {
+			label = "wbroker/app/broker";
+			constructor_3 [shape=plaintext label="NewBroker"];
+			
+			"*broker.ActualBroker" [label=<*broker.ActualBroker>];
+			
+		}
+		
+		
+		subgraph cluster_4 {
+			label = "wbroker/app/broker";
+			constructor_4 [shape=plaintext label="Adapter"];
+			
+			"broker.Service" [label=<broker.Service>];
+			
+		}
+		
+			constructor_4 -> "*broker.ActualBroker" [ltail=cluster_4];
+		
+		
+		subgraph cluster_5 {
+			label = "wbroker/app";
+			constructor_5 [shape=plaintext label="NewApp"];
+			
+			"dic.App" [label=<dic.App>];
+			
+		}
+		
+			constructor_5 -> "*grpc.Server" [ltail=cluster_5];
+		
+			constructor_5 -> "*configs.Configs" [ltail=cluster_5];
+		
+		
+		subgraph cluster_6 {
+			label = "wbroker/app/dig";
+			constructor_6 [shape=plaintext label="RegisterGRPC"];
+			
+			"*grpc.Server" [label=<*grpc.Server>];
+			
+		}
+		
+			constructor_6 -> "*dic.GRPCServerConfig" [ltail=cluster_6 style=dashed];
+		
+		
+			constructor_6 -> "[type=dic.Definition group=grpc_impl]" [ltail=cluster_6];
+		
+		subgraph cluster_7 {
+			label = "wbroker/app/dig";
+			constructor_7 [shape=plaintext label="NewContext"];
+			
+			"context.Context" [label=<context.Context>];
+			
+		}
+		
+		
+		subgraph cluster_8 {
+			label = "wbroker/app/dig";
+			constructor_8 [shape=plaintext label="NewConfigFunc.func1"];
+			
+			"*dic.GRPCServerConfig" [label=<*dic.GRPCServerConfig>];
+			"[]uint8[name=raw_config]" [label=<[]uint8<BR /><FONT POINT-SIZE="10">Name: raw_config</FONT>>];
+			
+		}
+		
+		
+	
+}
