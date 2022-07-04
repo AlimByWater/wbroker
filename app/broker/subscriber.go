@@ -12,20 +12,22 @@ const (
 
 // Subscriber represents a client who subscribed to a particular topic
 type Subscriber struct {
-	ID     string // TODO change to autoincrement id's
+	ID     string
 	ctx    context.Context
 	MsgC   chan Message
 	unsubC chan *Subscriber
 }
 
+// NewSubscriber return a new subscriber instance
 func NewSubscriber(ctx context.Context, unsubC chan *Subscriber) *Subscriber {
 	sub := &Subscriber{
-		ID:     uuid.New().String(),
+		ID:     uuid.New().String(), // TODO change to autoincrement id's
 		MsgC:   make(chan Message, defaultMsgBufferSize),
 		ctx:    ctx,
 		unsubC: unsubC,
 	}
 
+	go sub.eventListener()
 	return sub
 }
 

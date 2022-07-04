@@ -3,6 +3,7 @@ module github.com/AlimByWater/wbroker/external
 go 1.18
 
 require (
+	go.uber.org/dig v1.14.1
 	google.golang.org/grpc v1.47.0
 	google.golang.org/protobuf v1.28.0
 )

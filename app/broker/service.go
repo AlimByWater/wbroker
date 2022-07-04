@@ -3,10 +3,11 @@ package broker
 import (
 	"context"
 	"fmt"
+	validation "github.com/go-ozzo/ozzo-validation"
 )
 
 var (
-	ErrTopicDoesntExist error = fmt.Errorf("topic doesn't exist")
+	ErrFailedToPublishMessage error = fmt.Errorf("failed to publish message")
 )
 
 type (
@@ -23,7 +24,7 @@ type (
 
 	Message struct {
 		ID   string
-		Body string
+		Body []byte
 	}
 )
 
@@ -34,6 +35,7 @@ func NewBroker() *ActualBroker {
 	}
 }
 
+// Subscribe subscribes a client to a particular topic
 func (b *ActualBroker) Subscribe(ctx context.Context, topicName string) (chan Message, error) {
 	topic, exist := b.topics.Topic(topicName)
 	if !exist {
@@ -44,6 +46,7 @@ func (b *ActualBroker) Subscribe(ctx context.Context, topicName string) (chan Me
 	return msgChannel, nil
 }
 
+// Publish publishes a message to a particular topic
 func (b *ActualBroker) Publish(ctx context.Context, topicName string, message Message) (string, error) {
 	topic, exist := b.topics.Topic(topicName)
 	if !exist {
@@ -52,8 +55,15 @@ func (b *ActualBroker) Publish(ctx context.Context, topicName string, message Me
 
 	id, err := topic.Publish(message)
 	if err != nil {
-		return "", fmt.Errorf("failed to publish message")
+		return "", ErrFailedToPublishMessage
 	}
 
 	return id, nil
+}
+
+// Validate itself and returns error
+func (m *Message) Validate() error {
+	return validation.ValidateStruct(m,
+		validation.Field(&m.Body, validation.Required),
+	)
 }

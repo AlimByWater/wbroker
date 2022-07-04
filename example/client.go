@@ -1,5 +1,4 @@
-package wbroker
+package example
 
 func main() {
-
 }

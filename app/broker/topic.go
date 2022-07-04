@@ -5,7 +5,8 @@ import (
 	"sync"
 )
 
-// Topic contains all its subscribers
+// Topic contains all its subscribers and messages
+// Topic also manages publication of messages to its respective subscribers
 type Topic struct {
 	Name            string
 	Subscribers     map[string]*Subscriber
@@ -15,17 +16,20 @@ type Topic struct {
 	mu              sync.RWMutex
 }
 
+// TopicStorage is a storage of all existing topics
 type TopicStorage struct {
 	topics map[string]*Topic
 	mu     sync.RWMutex
 }
 
+// NewTopicStorage creates new TopicStorage
 func NewTopicStorage() *TopicStorage {
 	return &TopicStorage{
 		topics: make(map[string]*Topic),
 	}
 }
 
+// NewTopic creates new Topic
 func NewTopic(name string) *Topic {
 	topic := &Topic{
 		Name:            name,
@@ -39,6 +43,7 @@ func NewTopic(name string) *Topic {
 	return topic
 }
 
+// RegisterNewSubscriber registers new subscriber, assigns it to the topic and returns message channel
 func (t *Topic) RegisterNewSubscriber(ctx context.Context) chan Message {
 	sub := NewSubscriber(ctx, t.deleteSubC)
 
@@ -47,6 +52,7 @@ func (t *Topic) RegisterNewSubscriber(ctx context.Context) chan Message {
 	return sub.MsgC
 }
 
+// Publish registers new message and publishes it to all subscribers
 func (t *Topic) Publish(message Message) (string, error) {
 	message = t.MessagesStorage.RegisterNewMessage(message)
 
@@ -70,6 +76,7 @@ func (t *Topic) eventListener() {
 			wg.Wait()
 		case sub := <-t.deleteSubC:
 			t.mu.Lock()
+			close(sub.MsgC) // we should close msg channel when user unsubscribes
 			delete(t.Subscribers, sub.ID)
 			t.mu.Unlock()
 		}
@@ -77,6 +84,7 @@ func (t *Topic) eventListener() {
 	}
 }
 
+// Topic return topic from TopicStorage by name
 func (ts *TopicStorage) Topic(name string) (*Topic, bool) {
 	ts.mu.RLock()
 	defer ts.mu.RUnlock()
@@ -89,6 +97,7 @@ func (ts *TopicStorage) Topic(name string) (*Topic, bool) {
 	return topic, true
 }
 
+// CreateTopic creates new topics
 func (ts *TopicStorage) CreateTopic(name string) *Topic {
 	ts.mu.Lock()
 	defer ts.mu.Unlock()

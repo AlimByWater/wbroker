@@ -15,12 +15,14 @@ type MessageStorage struct {
 	mu       sync.RWMutex
 }
 
+// NewMessageStorage return new MessageStorage
 func NewMessageStorage() *MessageStorage {
 	return &MessageStorage{
 		messages: make(map[string]Message),
 	}
 }
 
+// RegisterNewMessage adds message to a message storage
 func (ms *MessageStorage) RegisterNewMessage(message Message) Message {
 	ms.mu.Lock()
 	defer ms.mu.Unlock()
